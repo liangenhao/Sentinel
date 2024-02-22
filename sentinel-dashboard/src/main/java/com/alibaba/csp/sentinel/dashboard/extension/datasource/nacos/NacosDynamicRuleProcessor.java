@@ -19,12 +19,15 @@ public class NacosDynamicRuleProcessor<T extends RuleEntity> extends DynamicRule
 
     private final ConfigService configService;
 
+    protected final NacosDatasourceProperties properties;
+
     public NacosDynamicRuleProcessor(RuleType ruleType,
                                      ConfigService configService,
                                      Codec<String, Object> codec,
                                      NacosDatasourceProperties properties) {
-        super(ruleType, codec, properties);
+        super(ruleType, codec);
         this.configService = configService;
+        this.properties = properties;
     }
 
     @Override
@@ -36,7 +39,7 @@ public class NacosDynamicRuleProcessor<T extends RuleEntity> extends DynamicRule
         if (StringUtil.isEmpty(rules)) {
             return new ArrayList<>();
         }
-        return (List<T>) codec.decode(rules, this.ruleType.getClazz());
+        return (List<T>) codec.decodes(rules, this.ruleType.getClazz());
     }
 
     @Override

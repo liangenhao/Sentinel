@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Configuration
 @ConditionalOnExpression("T(com.alibaba.csp.sentinel.dashboard.extension.datasource.config.DatasourceProviderEnum).valueOf('${datasource.provider:MEMORY}') != T(com.alibaba.csp.sentinel.dashboard.extension.datasource.config.DatasourceProviderEnum).MEMORY")
-@Import(RuleAspectImportSelector.class)
+@Import({RuleAspectImportSelector.class, ConfigAspectImportSelector.class})
 public class DynamicDatasourceConfig {
 
     public static final String DATASOURCE_CODEC_BEAN_NAME = "datasourceCodec";

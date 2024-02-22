@@ -21,13 +21,9 @@ public abstract class DynamicRuleProcessor<T extends RuleEntity> implements Dyna
 
     protected final Codec<String, Object> codec;
 
-    protected final NacosDatasourceProperties properties;
-
-    protected DynamicRuleProcessor(RuleType ruleType, Codec<String, Object> codec,
-                                   NacosDatasourceProperties properties) {
+    protected DynamicRuleProcessor(RuleType ruleType, Codec<String, Object> codec) {
         this.ruleType = ruleType;
         this.codec = codec;
-        this.properties = properties;
     }
 
     public RuleType getRuleType() {

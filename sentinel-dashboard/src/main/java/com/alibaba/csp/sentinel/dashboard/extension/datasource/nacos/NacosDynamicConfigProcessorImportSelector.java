@@ -1,6 +1,7 @@
-package com.alibaba.csp.sentinel.dashboard.extension.datasource.config;
+package com.alibaba.csp.sentinel.dashboard.extension.datasource.nacos;
 
-import com.alibaba.csp.sentinel.dashboard.extension.datasource.aspect.AbstractRuleAspect;
+import com.alibaba.csp.sentinel.dashboard.extension.datasource.DynamicConfigOfListProcessor;
+import com.alibaba.csp.sentinel.dashboard.extension.datasource.DynamicConfigProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ImportSelector;
@@ -8,25 +9,22 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 
 /**
- * 规则切片导入选择器
+ * Nacos dynamic config processor import selector.
  *
  * @author enhao
- * @see AbstractRuleAspect
  */
-public class RuleAspectImportSelector implements ImportSelector {
-
+public class NacosDynamicConfigProcessorImportSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata importingClassMetadata) {
-        AssignableTypeFilter assignableTypeFilter = new AssignableTypeFilter(AbstractRuleAspect.class);
         ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
-        scanner.addIncludeFilter(assignableTypeFilter);
+        scanner.addIncludeFilter(new AssignableTypeFilter(DynamicConfigProcessor.class));
+        scanner.addIncludeFilter(new AssignableTypeFilter(DynamicConfigOfListProcessor.class));
 
-        String basePackages = "com.alibaba.csp.sentinel.dashboard.extension.datasource.aspect";
+        String basePackages = "com.alibaba.csp.sentinel.dashboard.extension.datasource.nacos";
 
         return scanner.findCandidateComponents(basePackages)
                 .stream()
                 .map(BeanDefinition::getBeanClassName)
                 .toArray(String[]::new);
     }
-
 }

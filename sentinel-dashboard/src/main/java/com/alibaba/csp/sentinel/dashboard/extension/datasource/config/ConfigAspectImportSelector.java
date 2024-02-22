@@ -1,6 +1,6 @@
 package com.alibaba.csp.sentinel.dashboard.extension.datasource.config;
 
-import com.alibaba.csp.sentinel.dashboard.extension.datasource.aspect.AbstractRuleAspect;
+import com.alibaba.csp.sentinel.dashboard.extension.datasource.aspect.AbstractConfigAspect;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ImportSelector;
@@ -8,16 +8,14 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 
 /**
- * 规则切片导入选择器
+ * 配置切片导入选择器
  *
  * @author enhao
- * @see AbstractRuleAspect
  */
-public class RuleAspectImportSelector implements ImportSelector {
-
+public class ConfigAspectImportSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata importingClassMetadata) {
-        AssignableTypeFilter assignableTypeFilter = new AssignableTypeFilter(AbstractRuleAspect.class);
+        AssignableTypeFilter assignableTypeFilter = new AssignableTypeFilter(AbstractConfigAspect.class);
         ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(assignableTypeFilter);
 
@@ -28,5 +26,4 @@ public class RuleAspectImportSelector implements ImportSelector {
                 .map(BeanDefinition::getBeanClassName)
                 .toArray(String[]::new);
     }
-
 }

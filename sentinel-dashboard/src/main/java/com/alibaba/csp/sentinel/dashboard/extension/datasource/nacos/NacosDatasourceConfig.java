@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @EnableConfigurationProperties({DatasourceProviderProperties.class, NacosDatasourceProperties.class})
 @ConditionalOnProperty(prefix = DatasourceProviderProperties.PREFIX, name = "provider", havingValue = "NACOS")
-@Import(NacosDynamicRuleProcessorRegistrar.class)
+@Import({NacosDynamicRuleProcessorRegistrar.class, NacosDynamicConfigProcessorImportSelector.class})
 public class NacosDatasourceConfig {
 
     private static final Logger log = LoggerFactory.getLogger(NacosDatasourceConfig.class);
