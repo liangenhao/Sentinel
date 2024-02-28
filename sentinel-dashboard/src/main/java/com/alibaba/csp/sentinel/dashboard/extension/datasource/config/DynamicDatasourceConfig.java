@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 @Configuration
 @ConditionalOnExpression("T(com.alibaba.csp.sentinel.dashboard.extension.datasource.config.DatasourceProviderEnum).valueOf('${datasource.provider:MEMORY}') != T(com.alibaba.csp.sentinel.dashboard.extension.datasource.config.DatasourceProviderEnum).MEMORY")
 @Import({RuleAspectImportSelector.class, ConfigAspectImportSelector.class})
+@EnableAspectJAutoProxy(exposeProxy = true)
 public class DynamicDatasourceConfig {
 
     public static final String DATASOURCE_CODEC_BEAN_NAME = "datasourceCodec";

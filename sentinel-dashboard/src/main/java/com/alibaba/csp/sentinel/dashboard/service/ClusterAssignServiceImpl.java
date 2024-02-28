@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 
 import com.alibaba.csp.sentinel.cluster.ClusterStateManager;
 import com.alibaba.csp.sentinel.dashboard.domain.cluster.state.ClusterUniversalStatePairVO;
+import com.alibaba.csp.sentinel.dashboard.extension.datasource.config.DatasourceProviderEnum;
+import com.alibaba.csp.sentinel.dashboard.extension.datasource.config.DatasourceProviderProperties;
 import com.alibaba.csp.sentinel.util.AssertUtil;
 import com.alibaba.csp.sentinel.util.function.Tuple2;
 
@@ -40,6 +42,7 @@ import com.alibaba.csp.sentinel.dashboard.domain.cluster.request.ClusterAppAssig
 import com.alibaba.csp.sentinel.dashboard.util.MachineUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +59,9 @@ public class ClusterAssignServiceImpl implements ClusterAssignService {
     private SentinelApiClient sentinelApiClient;
     @Autowired
     private ClusterConfigService clusterConfigService;
+
+    @Autowired
+    private DatasourceProviderProperties providerProperties;
 
     private boolean isMachineInApp(/*@NonEmpty*/ String machineId) {
         return machineId.contains(":");
@@ -133,7 +139,13 @@ public class ClusterAssignServiceImpl implements ClusterAssignService {
             .setFailedClientSet(new HashSet<>())
             .setFailedServerSet(new HashSet<>());
         for (String machineId : machineIdSet) {
-            ClusterAppAssignResultVO resultVO = unbindClusterServer(app, machineId);
+            ClusterAppAssignResultVO resultVO;
+            if (DatasourceProviderEnum.MEMORY.equals(providerProperties.getProvider())) {
+                resultVO = unbindClusterServer(app, machineId);
+            } else {
+                ClusterAssignService clusterAssignService = (ClusterAssignService) AopContext.currentProxy();
+                resultVO = clusterAssignService.unbindClusterServer(app, machineId);
+            }
             result.getFailedClientSet().addAll(resultVO.getFailedClientSet());
             result.getFailedServerSet().addAll(resultVO.getFailedServerSet());
         }
