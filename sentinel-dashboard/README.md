@@ -1,5 +1,58 @@
 # Sentinel 控制台
 
+## 动态数据源改造
+
+改造基于 1.8.6 版本。
+
+采用推模式来实现，控制台直接将规则和配置信息直接推送到配置中心。微服务客户端通过注册监听器的方式时刻监听配置的变化。
+
+改造的原则为尽量不修改原有代码，通过扩展和配置的方式来实现。
+
+利用 Spring Boot 自动配置来实现数据源的配置，支持通过外部化配置方式修改数据源配置信息。
+
+对规则和配置的读取和推送抽象了通用 API，支持扩展不同数据源，支持通过外部化配置方式切换数据源。
+
+动态数据源改造代码均在 com.alibaba.csp.sentinel.dashboard.extension.datasource 包下。
+
+### 规则配置动态数据源改造
+
+控制台规则推送均是通过 SentinelApiClient 来处理的。
+
+通过 Spring AOP 对 SentinelApiClient API 进行拦截，重写查询规则信息和推送规则的逻辑，直接和配置中心进行交互。
+
+### 集群流控配置动态数据源改造
+
+集群限流配置推送均是通过 ClusterAssignService 和 ClusterConfigService 来处理的。
+
+通过 Spring AOP 对 ClusterAssignService 和 ClusterConfigService 进行拦截，重写推送配置的逻辑，直接和配置中心进行交互。
+
+### 扩展数据源说明
+
+实现 DynamicRuleProcessor 接口，用于对规则的查询和推送。
+
+实现 DynamicConfigProcessor 接口，用于对单个配置的查询和推送。
+
+实现 DynamicConfigOfListProcessor 接口，用于对配置列表的查询和推送。
+
+### 外部化配置说明
+
+| 配置项 | 说明                                   | 默认值 |
+| -------- | ---------------------------------------- | -------- |
+| `datasource.provider`       | 数据源提供方，可选值`MEMORY`，`NACOS`                 | `MEMORY`       |
+| `datasource.nacos.serverAddr`       | nacos 数据源服务地址                   | `127.0.0.1:8848`       |
+| `datasource.nacos.username`       | nacos 数据源鉴权用户名                 | `nacos`       |
+| `datasource.nacos.password`       | nacos 数据源鉴权密码                   | `nacos`       |
+| `datasource.nacos.encode`       | nacos 数据源配置内容编码               | `UTF-8`       |
+| `datasource.nacos.namespace`       | nacos 数据源命名空间                   | ""     |
+| `datasource.nacos.timeout`       | nacos 数据源获取配置超时时间，单位毫秒 | `3000`       |
+| `datasource.nacos.group`       | nacos 数据源配置组                     | `SENTINEL_RULES_CONFIG_GROUP`       |
+
+
+### 目前存在的问题
+
+sentinel dashboard 信息的存储均在内存中，未持久化
+重启服务后会导致一些问题，如：规则ID不一致/冲突问题、规则丢失问题
+
 ## 0. 概述
 
 Sentinel 控制台是流量控制、熔断降级规则统一配置和管理的入口，它为用户提供了机器自发现、簇点链路自发现、监控、规则配置等功能。在 Sentinel 控制台上，我们可以配置规则并实时查看流量控制效果。
